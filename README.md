@@ -1,24 +1,70 @@
-# v1.0.0
+# x-request-pool
+>
+>Http的前端请求池，避免重复的请求。
+>
+>使用单例模式，相同的请求会只发送一次，其余的则等待同请求返回后，再返回。
+>
+>
+[Demo](https://mikexia930.github.io/xRequestPool/)
+## 版本
+- v1.0.2
 
-## Project setup
+## 基于
+- axios [配置手册](https://axios-http.com/docs/intro)
+- js-md5
+- qs
+
+## 安装
 ```
-npm install
+npm install x-request-pool
+```
+或者
+```
+github下载源码
+```
+## 使用
+**直接用script引入**
+```
+<script src="lib/xrequestpool.umd.js"></script>
+```
+#### Vue示例
+**在main.js引入**
+```
+import XRequestPool from 'x-request-pool';
+```
+**获取实例**
+```
+const insConfig = {
+    baseUrl: '', // 会和 requestConfig 的 url 合并
+    timeout: 300, // 连接超时时间 秒
+    headers: object, // 头文件，具体设置可参考axios
+};
+const RequestPoolIns = RequestPool.getRequestIns(insConfig);
 ```
 
-### Compiles and hot-reloads for development
+**发送请求**
 ```
-npm run serve
+const requestConfig = {
+    url: string, // 链接地址
+    method: string, //请求方法 GET\POST\DELETE
+    headers: object, // 头文件，具体设置可参考axios
+    params: object, // get请求时的参数
+    data: 'object', // post请求时的参数
+};
+RequestPool.doRequest(RequestPoolIns, requestConfig).then((result) => {
+    this.resultData = `${this.resultData}\n${JSON.stringify(result)}`;
+    console.log('result-', result);
+}).catch((err) => {
+    console.log('err-', err);
+});
 ```
 
-### Compiles and minifies for production
+**获取当前连接池里的连接数据**
 ```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
+RequestPool.getRequestPools(); // { key: { 具体数据 } }
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+**取消请求**
+```
+RequestPool.cancelRequest(key？); // 不填写key，则取消所有
+```
