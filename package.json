@@ -1,6 +1,6 @@
 {
-  "name": "x-requet-pool",
-  "version": "1.0.2",
+  "name": "x-request-pool",
+  "version": "1.0.6",
   "keywords": [
     "request pool",
     "axios pool",
@@ -9,14 +9,14 @@
   ],
   "private": false,
   "license": "MIT",
-  "main": "lib/xrequestpool.umd.js",
+  "main": "packages/XRequestPool/src/index.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "lib": "vue-cli-service build --target lib --name xrequestpool --dest lib packages/XRequestPool/index.js"
   },
-  "dependencies": {
+  "peerDependencies": {
     "axios": "^0.21.1",
     "js-md5": "^0.7.3",
     "qs": "^6.5.2"

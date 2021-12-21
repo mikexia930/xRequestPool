@@ -74,7 +74,7 @@ class RequestPool {
           contentType = 'multipart/form-data';
           break;
         default:
-          contentType = 'application/json';
+          contentType = '';
           break;
       }
     }
@@ -107,13 +107,17 @@ class RequestPool {
    * @return object
    */
   getRequestIns(config) {
+    const configHeader = {
+      ...config.headers,
+    }
+    const contentType = this.setContentType(config);
+    if (contentType) {
+      configHeader['content-type'] = contentType;
+    }
     const currentIns = Axios.create({
       baseURL: config.baseUrl,
       timeout: config.timeout,
-      headers: {
-        'content-type': this.setContentType(config),
-        ...config.headers,
-      },
+      headers: configHeader,
     });
 
     // 当前实例请求拦截，添加中断标识并阻止相同请求发送
