@@ -127,7 +127,9 @@ class RequestPool {
       requestConfigCopy.cancelToken = new Axios.CancelToken((canceler) => {
         this.RequestInsCache[keyByUrl].cancel = canceler;
       });
-      requestConfigCopy.data = qs.stringify(requestConfig.data);
+      if (!(requestConfig.data instanceof FormData)) {
+        requestConfigCopy.data = qs.stringify(requestConfig.data);
+      }
       return requestConfigCopy;
     }, (error) => Promise.reject(error));
 
