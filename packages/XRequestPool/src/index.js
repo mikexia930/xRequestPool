@@ -109,7 +109,7 @@ class RequestPool {
   getRequestIns(config) {
     const configHeader = {
       ...config.headers,
-    }
+    };
     const contentType = this.setContentType(config);
     if (contentType) {
       configHeader['content-type'] = contentType;
@@ -145,8 +145,9 @@ class RequestPool {
    * 关闭请求
    * @param keyByUrl
    */
-  cancelRequest(keyByUrl = '') {
-    if (keyByUrl) {
+  cancelRequest(cancelConfig) {
+    if (cancelConfig) {
+      const keyByUrl = this.getKeyByUrl(cancelConfig);
       if (this.isHasCacheRequest(keyByUrl)) {
         this.RequestInsCache[keyByUrl].cancel();
       }
