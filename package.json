@@ -1,6 +1,6 @@
 {
   "name": "x-request-pool",
-  "version": "1.0.8",
+  "version": "1.0.11",
   "keywords": [
     "request pool",
     "axios pool",
@@ -9,7 +9,10 @@
   ],
   "private": false,
   "license": "MIT",
-  "main": "packages/XRequestPool/src/index.js",
+  "main": "lib/xrequestpool.umd.js",
+  "files": [
+    "lib/*"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -33,5 +36,9 @@
     "vue-template-compiler": "^2.6.11",
     "core-js": "^3.6.5",
     "vue": "^2.6.11"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "js-md5": "^0.7.3"
   }
 }
