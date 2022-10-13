@@ -1,6 +1,6 @@
 {
   "name": "x-request-pool",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "keywords": [
     "request pool",
     "axios pool",

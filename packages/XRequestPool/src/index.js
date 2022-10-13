@@ -107,13 +107,14 @@ class RequestPool {
    * @return object
    */
   getRequestIns(config) {
-    const configHeader = {
-      ...config.headers,
-    };
+    let configHeader = {};
     const contentType = this.setContentType(config);
     if (contentType) {
       configHeader['content-type'] = contentType;
     }
+    configHeader = {
+      ...config.headers,
+    };
     const currentIns = Axios.create({
       baseURL: config.baseUrl,
       timeout: config.timeout,
