@@ -39,21 +39,23 @@ class RequestPool {
    * @param config
    */
   getKeyByUrl(config) {
-    const { method, url } = config;
-    let key = url;
-    if (method) {
-      switch (method.toUpperCase()) {
-        case 'GET':
+    const { method, url, identity } = config;
+    let token;
+    if (identity) {
+      token = identity;
+    } else {
+      let key = url;
+      if (method) {
+        if (config.params) {
           key += JSON.stringify(config.params);
-          break;
-        case 'POST':
+        }
+        if (config.data) {
           key += JSON.stringify(config.data);
-          break;
-        default:
-          break;
+        }
       }
+      token = md5(key);
     }
-    return md5(key);
+    return token;
   }
 
   /**
@@ -113,6 +115,7 @@ class RequestPool {
       configHeader['content-type'] = contentType;
     }
     configHeader = {
+      ...configHeader,
       ...config.headers,
     };
     const currentIns = Axios.create({

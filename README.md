@@ -7,7 +7,7 @@
 >
 [Demo](https://mikexia930.github.io/xRequestPool/)
 ## 版本
-- v1.0.12
+- v1.0.13
 
 ## 基于
 - axios [配置手册](https://axios-http.com/docs/intro)
@@ -45,6 +45,7 @@ const RequestPoolIns = RequestPool.getRequestIns(insConfig);
 **发送请求**
 ```
 const requestConfig = {
+    identity?: string, // 当次请求标识，可用于 cancel
     url: string, // 链接地址
     method: string, //请求方法 GET\POST\DELETE
     headers: object, // 头文件，具体设置可参考axios
@@ -66,5 +67,5 @@ RequestPool.getRequestPools(); // { key: { 具体数据 } }
 
 **取消请求**
 ```
-RequestPool.cancelRequest(key？); // 不填写key，则取消所有
+RequestPool.cancelRequest(requestConfig?); // 不填写，则取消所有
 ```
