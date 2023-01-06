@@ -1,6 +1,6 @@
 {
   "name": "x-request-pool",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "keywords": [
     "request pool",
     "axios pool",
@@ -21,8 +21,7 @@
   },
   "peerDependencies": {
     "axios": "^0.21.1",
-    "js-md5": "^0.7.3",
-    "qs": "^6.5.2"
+    "js-md5": "^0.7.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -30,15 +29,15 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/eslint-config-airbnb": "^5.0.2",
     "babel-eslint": "^10.1.0",
+    "core-js": "^3.6.5",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11",
-    "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^0.21.1",
     "js-md5": "^0.7.3"
   }
 }

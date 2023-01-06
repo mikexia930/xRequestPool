@@ -7,7 +7,7 @@
 >
 [Demo](https://mikexia930.github.io/xRequestPool/)
 ## 版本
-- v1.0.13
+- v1.0.14
 
 ## 基于
 - axios [配置手册](https://axios-http.com/docs/intro)

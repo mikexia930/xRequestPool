@@ -1,6 +1,5 @@
 import Axios from 'axios';
 import md5 from 'js-md5';
-import qs from 'qs';
 
 class RequestPool {
   static RequestIns;
@@ -131,9 +130,6 @@ class RequestPool {
       requestConfigCopy.cancelToken = new Axios.CancelToken((canceler) => {
         this.RequestInsCache[keyByUrl].cancel = canceler;
       });
-      if (!(requestConfig.data instanceof FormData)) {
-        requestConfigCopy.data = qs.stringify(requestConfig.data);
-      }
       return requestConfigCopy;
     }, (error) => Promise.reject(error));
 
