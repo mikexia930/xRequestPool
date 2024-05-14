@@ -1,6 +1,6 @@
 {
-  "name": "x-request-pool",
-  "version": "1.0.11",
+  "name": "ts-x-request-pool",
+  "version": "1.1.1",
   "keywords": [
     "request pool",
     "axios pool",
@@ -9,36 +9,30 @@
   ],
   "private": false,
   "license": "MIT",
-  "main": "lib/xrequestpool.umd.js",
   "files": [
     "lib/*"
   ],
+  "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name xrequestpool --dest lib packages/XRequestPool/index.js"
-  },
-  "peerDependencies": {
-    "axios": "^0.21.1",
-    "js-md5": "^0.7.3",
-    "qs": "^6.5.2"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/eslint-config-airbnb": "^5.0.2",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11",
-    "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "dev": "vite",
+    "build:lib": "tsc && vite build --mode library",
+    "build:demo": "tsc && vite build --mode demo",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^0.27.2",
-    "js-md5": "^0.7.3"
-  }
+    "axios": "^1.6.8",
+    "js-md5": "^0.8.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vue": "^3.4.21",
+    "vue-tsc": "^2.0.6",
+    "vite-plugin-dts": "^3.9.1"
+  },
+  "main": "lib/xrequestpool.cjs.js",
+  "module": "lib/xrequestpool.es.js",
+  "unpkg": "lib/xrequestpool.umd.js",
+  "types": "lib/index.d.ts"
 }

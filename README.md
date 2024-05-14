@@ -1,4 +1,4 @@
-# x-request-pool
+# x-request-pool@ts
 >
 >Http的前端请求池，避免重复的请求。
 >
@@ -7,16 +7,16 @@
 >
 [Demo](https://mikexia930.github.io/xRequestPool/)
 ## 版本
-- v1.0.11
+- v1.1.1
 
 ## 基于
 - axios [配置手册](https://axios-http.com/docs/intro)
 - js-md5
-- qs
+- typescript
 
 ## 安装
 ```
-npm install x-request-pool
+npm install ts-x-request-pool
 ```
 或者
 ```
