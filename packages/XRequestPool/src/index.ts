@@ -1,14 +1,37 @@
-import Axios from 'axios';
-import md5 from 'js-md5';
+import Axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse
+} from 'axios';
+import { md5 } from 'js-md5';
+
+export interface IFRequestConfig extends AxiosRequestConfig{
+  identity?: string;
+  contentType?: string;
+  baseUrl?: string;
+}
+
+export interface IFCacheData {
+  [key: string]: {
+    cancel?: any,
+    result?: any,
+    times?: number;
+  };
+}
+
+enum EnumWorkType {
+  Add = 'add',
+  Deduct = 'deduct'
+}
 
 class RequestPool {
-  static RequestIns;
+  static RequestIns: RequestPool | null = null;
 
   /**
    * 获取单例
    */
   static getInstance() {
-    if (this.RequestIns == null) {
+    if (this.RequestIns === null) {
       this.RequestIns = new RequestPool();
     }
     return this.RequestIns;
@@ -21,9 +44,9 @@ class RequestPool {
    *   result,
    *   times,
    * }
-   * @type {{cancel: {}, result: {}}}
+   * @type {{}}
    */
-  RequestInsCache = {};
+  RequestInsCache: IFCacheData = {};
 
   /**
    * 获取当前的请求池数据
@@ -37,22 +60,22 @@ class RequestPool {
    * 组装url,生成当次请求的Token
    * @param config
    */
-  getKeyByUrl(config) {
-    const { method, url, identity } = config;
+  getKeyByUrl(config: IFRequestConfig): string {
+    const { method, url } = config;
     let token;
-    if (identity) {
-      token = identity;
+    if (config?.identity) {
+      token = config.identity;
     } else {
       let key = url;
       if (method) {
-        if (config.params) {
+        if (config?.params) {
           key += JSON.stringify(config.params);
         }
-        if (config.data) {
+        if (config?.data) {
           key += JSON.stringify(config.data);
         }
       }
-      token = md5(key);
+      token = md5(key || '');
     }
     return token;
   }
@@ -61,10 +84,10 @@ class RequestPool {
    * 获取 content-type
    * @param config
    */
-  setContentType(config) {
+  setContentType(config: IFRequestConfig): string {
     let contentType = '';
     if (Object.prototype.hasOwnProperty.call(config, 'contentType')) {
-      contentType = config.contentType;
+      contentType = config.contentType || '';
     } else {
       const method = config.method || '';
       switch (method.toUpperCase()) {
@@ -87,7 +110,7 @@ class RequestPool {
    * @param keyByUrl
    * @return {boolean}
    */
-  isHasCacheRequest(keyByUrl) {
+  isHasCacheRequest(keyByUrl: string) {
     return Object.prototype.hasOwnProperty.call(
       this.RequestInsCache,
       keyByUrl,
@@ -98,7 +121,7 @@ class RequestPool {
    * 删除已有请求
    * @param keyByUrl
    */
-  deleteCacheRequest(keyByUrl) {
+  deleteCacheRequest(keyByUrl: string) {
     delete this.RequestInsCache[keyByUrl];
   }
 
@@ -107,8 +130,8 @@ class RequestPool {
    * @param config
    * @return object
    */
-  getRequestIns(config) {
-    let configHeader = {};
+  getRequestIns(config: IFRequestConfig): AxiosInstance {
+    let configHeader: any = {};
     const contentType = this.setContentType(config);
     if (contentType) {
       configHeader['content-type'] = contentType;
@@ -117,44 +140,58 @@ class RequestPool {
       ...configHeader,
       ...config.headers,
     };
-    const currentIns = Axios.create({
-      baseURL: config.baseUrl,
+    const currentIns: AxiosInstance = Axios.create({
+      baseURL: config.baseUrl || '',
       timeout: config.timeout,
       headers: configHeader,
-    });
+    } as any);
 
     // 当前实例请求拦截，添加中断标识并阻止相同请求发送
-    currentIns.interceptors.request.use((requestConfig) => {
+    currentIns.interceptors.request.use((requestConfig: any) => {
       const requestConfigCopy = requestConfig;
-      const keyByUrl = this.getKeyByUrl(requestConfigCopy);
-      requestConfigCopy.cancelToken = new Axios.CancelToken((canceler) => {
+      const controller = new AbortController();
+      requestConfigCopy.signal = controller.signal;
+      const keyByUrl = this.getKeyByUrl(config.identity ? { identity: config.identity } : requestConfig);
+      /*
+      requestConfigCopy.cancelToken = new Axios.CancelToken((canceler: Canceler) => {
         this.RequestInsCache[keyByUrl].cancel = canceler;
       });
+      */
+      this.RequestInsCache[keyByUrl].cancel = controller;
       return requestConfigCopy;
     }, (error) => Promise.reject(error));
 
     // 当前实例响应拦截
     currentIns.interceptors.response.use(
-      (result) => result,
+      (result: AxiosResponse) => result,
       (error) => Promise.reject(error),
     );
+
     return currentIns;
+
   }
 
   /**
    * 关闭请求
    * @param keyByUrl
    */
-  cancelRequest(cancelConfig) {
-    if (cancelConfig) {
+  cancelRequest(cancelConfig: IFRequestConfig | string | undefined) {
+    if (typeof cancelConfig === 'object') {
       const keyByUrl = this.getKeyByUrl(cancelConfig);
       if (this.isHasCacheRequest(keyByUrl)) {
-        this.RequestInsCache[keyByUrl].cancel();
+        this.RequestInsCache[keyByUrl].cancel.abort();
       }
     } else {
-      Object.keys(this.RequestInsCache).forEach((requestIns) => {
-        this.RequestInsCache[requestIns].cancel();
-      });
+      const keyByUrl = cancelConfig;
+      if (keyByUrl) {
+        if (this.isHasCacheRequest(keyByUrl)) {
+          this.RequestInsCache[keyByUrl].cancel.abort();
+        }
+      } else {
+        Object.keys(this.RequestInsCache).forEach((requestIns) => {
+          this.RequestInsCache[requestIns].cancel.abort();
+        });
+      }
     }
   }
 
@@ -163,13 +200,13 @@ class RequestPool {
    *  @param work add / deduct
    * @param keyByUrl
    */
-  addRequestTimes(work, keyByUrl) {
+  addRequestTimes(work: EnumWorkType, keyByUrl: string): number {
     let times = this.RequestInsCache[keyByUrl].times || 0;
     switch (work) {
-      case 'deduct':
+      case EnumWorkType.Deduct:
         times -= 1;
         break;
-      case 'add':
+      case EnumWorkType.Add:
       default:
         times += 1;
         break;
@@ -181,8 +218,9 @@ class RequestPool {
   /**
    * 设置请求值
    */
-  setRequestResult(keyByUrl, status, data = '') {
-    if (this.RequestInsCache[keyByUrl].times && this.RequestInsCache[keyByUrl].times > 0) {
+  setRequestResult(keyByUrl: string, status: string, data: any) {
+    const curTimes = this.RequestInsCache?.[keyByUrl]?.times || 0;
+    if (curTimes > 0) {
       this.RequestInsCache[keyByUrl].result = {
         status,
         data,
@@ -198,7 +236,7 @@ class RequestPool {
    * @param config
    * @return {Promise<unknown>}
    */
-  doRequest(axiosIns, config) {
+  doRequest(axiosIns: AxiosInstance, config: IFRequestConfig) {
     const keyByUrl = this.getKeyByUrl(config);
     const isHasRequest = this.isHasCacheRequest(keyByUrl);
     let promiseIns = null;
@@ -206,12 +244,12 @@ class RequestPool {
       this.RequestInsCache[keyByUrl] = {};
     }
     if (isHasRequest) {
-      this.addRequestTimes('add', keyByUrl);
+      this.addRequestTimes(EnumWorkType.Add, keyByUrl);
       promiseIns = new Promise((resolve, reject) => {
         const interIns = setInterval(() => {
           if (this.RequestInsCache[keyByUrl]?.result?.status) {
             clearInterval(interIns);
-            const curTimes = this.addRequestTimes('deduct', keyByUrl);
+            const curTimes = this.addRequestTimes(EnumWorkType.Deduct, keyByUrl);
             const curResult = this.RequestInsCache[keyByUrl].result;
             if (curTimes <= 0) {
               this.deleteCacheRequest(keyByUrl);

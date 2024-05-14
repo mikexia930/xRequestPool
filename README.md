@@ -1,4 +1,4 @@
-# x-request-pool
+# x-request-pool@ts
 >
 >Http的前端请求池，避免重复的请求。
 >
@@ -7,16 +7,16 @@
 >
 [Demo](https://mikexia930.github.io/xRequestPool/)
 ## 版本
-- v1.0.14
+- v1.1.1
 
 ## 基于
 - axios [配置手册](https://axios-http.com/docs/intro)
 - js-md5
-- qs
+- typescript
 
 ## 安装
 ```
-npm install x-request-pool
+npm install ts-x-request-pool
 ```
 或者
 ```
@@ -45,7 +45,6 @@ const RequestPoolIns = RequestPool.getRequestIns(insConfig);
 **发送请求**
 ```
 const requestConfig = {
-    identity?: string, // 当次请求标识，可用于 cancel
     url: string, // 链接地址
     method: string, //请求方法 GET\POST\DELETE
     headers: object, // 头文件，具体设置可参考axios
@@ -67,5 +66,5 @@ RequestPool.getRequestPools(); // { key: { 具体数据 } }
 
 **取消请求**
 ```
-RequestPool.cancelRequest(requestConfig?); // 不填写，则取消所有
+RequestPool.cancelRequest(key？); // 不填写key，则取消所有
 ```
